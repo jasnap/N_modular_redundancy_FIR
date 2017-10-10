@@ -20,7 +20,7 @@ end entity ; -- fault_tolerant_fir
 architecture arch of fault_tolerant_fir is
 
 signal fir1_out, fir2_out, fir3_out, fir4_out, fir5_out: std_logic_vector(data_w - 1 downto 0);
-signal voter_in1, voter_in2, voter_in3, voter_in4, voter_in5, voter_out: std_logic_vector(data_w - 1 downto 0);
+signal voter_out: std_logic_vector(data_w - 1 downto 0);
 
 component FIR
   generic (
