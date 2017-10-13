@@ -36,7 +36,6 @@ class fir_driver;
 
   while(!$feof(fileid)) begin
   	l = $fscanf(fileid, "%s", str);
-    // $display(str);
 	  wram_vector.push_back(str.atobin());
   end
   $fclose(fileid);

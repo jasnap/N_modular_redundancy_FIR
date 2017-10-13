@@ -1,0 +1,7 @@
+-sv
+-mfcu
+tb/fir_driver.sv
+tb/fir_if.sv
+tb/fir_env.sv
+tb/test.sv
+tb/tb_top.sv

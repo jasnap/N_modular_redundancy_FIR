@@ -1,14 +1,7 @@
-+incdir+tb/
--v93
+-93
 hdl/mac.vhd
 hdl/fir.vhd
 hdl/util_pkg.vhd
 hdl/voter.vhd
 hdl/fault_tolerant_fir.vhd
-
--sv
-tb/fir_driver.sv
-tb/fir_if.sv
-tb/fir_env.sv
-tb/test.sv
-tb/tb_top.sv
+hdl/ft_fir_tb.vhd
