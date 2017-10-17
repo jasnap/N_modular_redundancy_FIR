@@ -18,26 +18,41 @@ architecture Behavioral of MAC is
   signal reg_s : std_logic_vector(2*data_w-1 downto 0) := (others => '0');
   signal stuck_at1: std_logic_vector(2*data_w-1 downto 0) := (others => '1');
   signal stuck_at0: std_logic_vector(2*data_w-1 downto 0):= (others => '0');
-  signal mul_out: signed(2*data_w-1 downto 0);  
+  signal mul_out: unsigned(2*data_w-1 downto 0);  
 begin  -- architecture Behavioral
 
-mul_out <= signed(u_in) * signed(b_in);
-  process(clk, u_in, b_in, mac_in)
+  process(clk)
+  
   begin
     if clk'event and clk ='1' then
         case fault_ctrl is
             when "000" => 
                 reg_s <= mac_in;                --no fault
+                mul_out <= unsigned(u_in) * unsigned(b_in);
             when "001" => 
                 reg_s <= mac_in and stuck_at0;   --reg_s stuck at 0
+                mul_out <= unsigned(u_in) * unsigned(b_in);
             when "010" =>
                 reg_s <= mac_in or stuck_at1;   --reg_s stuck at 1
+                mul_out <= unsigned(u_in) * unsigned(b_in);
+            when "011" => 
+                mul_out <= unsigned(stuck_at0); --mul_out stuck at 0
+                reg_s <= mac_in;
+            when "100" =>
+                mul_out <= unsigned(stuck_at1); --mul_out stuck at 0
+                reg_s <= mac_in;
+            when "101" => 
+                mul_out <= unsigned(stuck_at0); --mac_out stuck at 0
+                reg_s <= mac_in and stuck_at0;
+            when "110" => 
+                mul_out <= unsigned(stuck_at1); --mac_out stuck at 1
+                reg_s <= mac_in or stuck_at1;
             when others => null;
         end case;
     end if;
+    
   end process;
 
-  mac_out <= std_logic_vector(signed(reg_s) + mul_out);
+  mac_out <= std_logic_vector(unsigned(reg_s) + mul_out);
 
 end Behavioral;
-
