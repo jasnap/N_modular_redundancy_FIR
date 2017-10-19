@@ -1,8 +1,8 @@
-library ieee;
+library ieee, modelsim_lib;
 use ieee.std_logic_1164.all;
+use modelsim_lib.util.all;
 use ieee.numeric_std.all;
 use work.util_pkg.all;
-
 
 entity ft_fir_tb is
     generic(data_w : natural := 24;
@@ -79,6 +79,9 @@ DUT : entity work.fault_tolerant_fir
          wait until clk = '1';
          for i in 0 to order loop
              we_in <= '1';
+             signal_force("ft_fir_tb/DUT/FIR_1/y_out", "000000000000000000000000", 0 ns, freeze, open, 1);
+             signal_force("ft_fir_tb/DUT/FIR_3/y_out", "000000000000000000000000", 0 ns, freeze, open, 1);
+             signal_force("ft_fir_tb/DUT/FIR_5/y_out", "000000000000000000000000", 0 ns, freeze, open, 1);
              coef_addr_in <= std_logic_vector(to_unsigned(i, log2c(order)));
              coef_in <= coef_reg(i);  
              wait until clk = '1';
