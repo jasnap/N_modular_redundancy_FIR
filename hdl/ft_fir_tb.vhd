@@ -31,24 +31,24 @@ DUT : entity work.fault_tolerant_fir
     			data_w 	=> data_w)
 		port map(
 				clk 		 => clk,
-				we_in  		 => we_in,	
+				we_in  		 => we_in,
 				coef_addr_in => coef_addr_in,
-				coef_in 	 => coef_in,	
+				coef_in 	 => coef_in,
 				u_in		 => u_in,
 				y_out 		 => y_out
 				);
 	coef_reg <= ("000000011111101100010011",
-                            "111111110000000010111111",
-                            "111101111110101100011101",
-                            "000000100000110110001000",
-                            "001001100110111110000110",
-                            "001111010011100000000101",
-                            "001001100110111110000110",
-                            "000000100000110110001000",
-                            "111101111110101100011101",
-                            "111111110000000010111111",
-                            "000000011111101100010011");
-            
+                 "111111110000000010111111",
+                 "111101111110101100011101",
+                 "000000100000110110001000",
+                 "001001100110111110000110",
+                 "001111010011100000000101",
+                 "001001100110111110000110",
+                 "000000100000110110001000",
+                 "111101111110101100011101",
+                 "111111110000000010111111",
+                 "000000011111101100010011");
+
     data_in_reg <= ("111111111100110110010110",
                     "000000000000000000000000",
                     "111111111110011011001011",
@@ -59,8 +59,8 @@ DUT : entity work.fault_tolerant_fir
                     "000000001001011100111101",
                     "111111011100100011011101",
                     "000000001001011100111101");
-            
-    expected_data <= (    "111111111111111100111000",
+
+    expected_data <= (  "111111111111111100111000",
                         "000000000000000001100101",
                         "000000000000001011001011",
                         "111111111111100011110100",
@@ -72,23 +72,22 @@ DUT : entity work.fault_tolerant_fir
                         "111111110110101011010110");
 
      clk <= not clk after 10 ns;
-     
+
      WaveGenProc: process
-          begin
-         
+     begin
+       wait until clk = '1';
+       for i in 0 to order loop
+         we_in <= '1';
+         signal_force("ft_fir_tb/DUT/FIR_1/y_out", "000000000000000000000000", 0 ns, freeze, open, 1);
+         signal_force("ft_fir_tb/DUT/FIR_3/y_out", "000000000000000000000000", 0 ns, freeze, open, 1);
+         signal_force("ft_fir_tb/DUT/FIR_5/y_out", "000000000000000000000000", 0 ns, freeze, open, 1);
+         coef_addr_in <= std_logic_vector(to_unsigned(i, log2c(order)));
+         coef_in <= coef_reg(i);
          wait until clk = '1';
-         for i in 0 to order loop
-             we_in <= '1';
-             signal_force("ft_fir_tb/DUT/FIR_1/y_out", "000000000000000000000000", 0 ns, freeze, open, 1);
-             signal_force("ft_fir_tb/DUT/FIR_3/y_out", "000000000000000000000000", 0 ns, freeze, open, 1);
-             signal_force("ft_fir_tb/DUT/FIR_5/y_out", "000000000000000000000000", 0 ns, freeze, open, 1);
-             coef_addr_in <= std_logic_vector(to_unsigned(i, log2c(order)));
-             coef_in <= coef_reg(i);  
-             wait until clk = '1';
-         end loop;
-         for i in 0 to order -1 loop 
-             u_in <= data_in_reg(i);
-             wait until clk = '1';
-         end loop;
-       end process WaveGenProc;
+       end loop;
+       for i in 0 to order -1 loop
+         u_in <= data_in_reg(i);
+         wait until clk = '1';
+       end loop;
+     end process WaveGenProc;
 end Behavioral;
