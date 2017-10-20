@@ -73,14 +73,42 @@ DUT : entity work.fault_tolerant_fir
 
      clk <= not clk after 10 ns;
 
+FaultSelProc: process
+  type fault_type is (_NONE, _ERROR, REG_S_SA0, REG_S_SA0, MUL_OUT_SA0, MUL_OUT_SA1, MAC_OUT_SA0, MAC_OUT_SA1);
+  signal fault_sel: fault_type;
+  signal mac_sel: std_logic_vector(2 downto 0);
+  signal fir_sel: std_logic_vector(2 downto 0);
+begin
+  fault_sel <= _NONE;
+  mac_sel <= "000";
+  fir_sel <= "000";
+  wait for 200 ns;
+
+  fault_sel <= REG_S_SA0;
+  wait for 200 ns;
+
+  fault_sel <= REG_S_SA1;
+  wait for 200 ns;
+
+  fault_sel <= MUL_OUT_SA0;
+  wait for 200 ns;
+
+  fault_sel <= MUL_OUT_SA1;
+  wait for 200 ns;
+
+  fault_sel <= MAC_OUT_SA0;
+  wait for 200 ns;
+
+  fault_sel <= MAC_OUT_SA1;
+  wait for 200 ns;
+
+end process FaultSelProc;
+
      WaveGenProc: process
      begin
        wait until clk = '1';
        for i in 0 to order loop
          we_in <= '1';
-         signal_force("ft_fir_tb/DUT/FIR_1/y_out", "000000000000000000000000", 0 ns, freeze, open, 1);
-         signal_force("ft_fir_tb/DUT/FIR_3/y_out", "000000000000000000000000", 0 ns, freeze, open, 1);
-         signal_force("ft_fir_tb/DUT/FIR_5/y_out", "000000000000000000000000", 0 ns, freeze, open, 1);
          coef_addr_in <= std_logic_vector(to_unsigned(i, log2c(order)));
          coef_in <= coef_reg(i);
          wait until clk = '1';
