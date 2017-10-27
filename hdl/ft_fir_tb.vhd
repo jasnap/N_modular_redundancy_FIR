@@ -23,10 +23,6 @@ architecture Behavioral of ft_fir_tb is
     signal data_in_reg : data_reg(order-1 downto 0);
     signal expected_data : data_reg(order-1 downto 0);
 
-    type fault_type is (_NONE, _ERROR, REG_S_SA0, REG_S_SA0, MUL_OUT_SA0, MUL_OUT_SA1, MAC_OUT_SA0, MAC_OUT_SA1);
-    signal fault_sel: fault_type;
-    signal mac_sel: std_logic_vector(3 downto 0);
-    signal fir_sel: std_logic_vector(2 downto 0);
 begin
 
 DUT : entity work.fault_tolerant_fir
@@ -77,89 +73,14 @@ DUT : entity work.fault_tolerant_fir
 
      clk <= not clk after 10 ns;
 
-FaultSelProc: process
-begin
-  fault_sel <= _NONE;
-  mac_sel <= "000";
-  fir_sel <= "000";
-  wait for 200 ns;
-
-  fault_sel <= REG_S_SA0;
-  wait for 200 ns;
-
-  fault_sel <= REG_S_SA1;
-  wait for 200 ns;
-
-  fault_sel <= MUL_OUT_SA0;
-  wait for 200 ns;
-
-  fault_sel <= MUL_OUT_SA1;
-  wait for 200 ns;
-
-  fault_sel <= MAC_OUT_SA0;
-  wait for 200 ns;
-
-  fault_sel <= MAC_OUT_SA1;
-  wait for 200 ns;
-
-end process FaultSelProc;
-
-SignalForceProc: process(fault_sel, mac_sel, fir_sel)
-  type String is array (positive range<>) of character;
-  constant _MAC: String(1 to 40);
-  constant _FIR: String(1 to 20);
-  constant _FT_FIR: String(1 to 60);
-  constant
-begin
-  case(fir_sel) is
-    when "000" => _FIR := "";
-    when "001" => _FIR := "ft_fir_tb/DUT/FIR_1/";
-    when "010" => _FIR := "ft_fir_tb/DUT/FIR_2/";
-    when "011" => _FIR := "ft_fir_tb/DUT/FIR_3/";
-    when "100" => _FIR := "ft_fir_tb/DUT/FIR_4/";
-    when "101" => _FIR := "ft_fir_tb/DUT/FIR_5/";
-    when others => null;
-  end case;
-
-  case(mac_sel) is
-    when "0000" => _MAC := "";
-    when "0001" => _MAC := _FIR & "MAC0/";
-    when "0010" => _MAC := _FIR & "MAC_OTHERS[1].MAC_X/";
-    when "0011" => _MAC := _FIR & "MAC_OTHERS[2].MAC_X/";
-    when "0100" => _MAC := _FIR & "MAC_OTHERS[3].MAC_X/";
-    when "0101" => _MAC := _FIR & "MAC_OTHERS[4].MAC_X/";
-    when "0110" => _MAC := _FIR & "MAC_OTHERS[5].MAC_X/";
-    when "0111" => _MAC := _FIR & "MAC_OTHERS[6].MAC_X/";
-    when "1000" => _MAC := _FIR & "MAC_OTHERS[7].MAC_X/";
-    when "1001" => _MAC := _FIR & "MAC_OTHERS[8].MAC_X/";
-    when "1010" => _MAC := _FIR & "MAC_OTHERS[9].MAC_X/";
-    when others => null;
-  end case;
-
-  case(fault_sel) is
-    when REG_S_SA0 => _FT_FIR := _MAC & "reg_s";
-                      signal_force(_FT_FIR, "000000000000000000000000", 0 ns, freeze, open, 1);
-    when REG_S_SA1 =>_FT_FIR := _MAC & "reg_s";
-                     signal_force(_FT_FIR, "111111111111111111111111", 0 ns, freeze, open, 1);
-    when MUL_OUT_SA0 =>_FT_FIR := _MAC & "mul_out";
-                       signal_force(_FT_FIR, "000000000000000000000000", 0 ns, freeze, open, 1);
-    when MUL_OUT_SA1 =>_FT_FIR := _MAC & "mul_out";
-                       signal_force(_FT_FIR, "111111111111111111111111", 0 ns, freeze, open, 1);
-    when MAC_OUT_SA0 =>_FT_FIR := _MAC & "mac_out";
-                       signal_force(_FT_FIR, "000000000000000000000000", 0 ns, freeze, open, 1);
-    when MAC_OUT_SA1 =>_FT_FIR := _MAC & "mac_out";
-                       signal_force(_FT_FIR, "111111111111111111111111", 0 ns, freeze, open, 1);
-    when _NONE => _FT_FIT := "";
-    when others => null;
-  end case;
-
-end process SignalForceProc;
-
      WaveGenProc: process
      begin
        wait until clk = '1';
        for i in 0 to order loop
          we_in <= '1';
+         signal_force("ft_fir_tb/DUT/FIR_1/y_out", "000000000000000000000000", 0 ns, freeze, open, 1);
+         signal_force("ft_fir_tb/DUT/FIR_3/y_out", "000000000000000000000000", 0 ns, freeze, open, 1);
+         signal_force("ft_fir_tb/DUT/FIR_5/y_out", "000000000000000000000000", 0 ns, freeze, open, 1);
          coef_addr_in <= std_logic_vector(to_unsigned(i, log2c(order)));
          coef_in <= coef_reg(i);
          wait until clk = '1';
