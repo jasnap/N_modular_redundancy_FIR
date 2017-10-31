@@ -13,13 +13,13 @@ entity ft_fir_tb is
 end ft_fir_tb;
 
 architecture Behavioral of ft_fir_tb is
-	constant period : time := 20 ns;
-	signal     clk 			: std_logic := '1';
-    signal     we_in          : std_logic;
-    signal     coef_addr_in : std_logic_vector(log2c(order) - 1 downto 0);
-    signal     coef_in         : std_logic_vector(data_w - 1 downto 0);
-    signal     u_in           : std_logic_vector(data_w - 1 downto 0);
-    signal     y_out           : std_logic_vector(data_w - 1 downto 0);
+	constant period : time  := 20 ns;
+	signal     clk 			    : std_logic := '1';
+    signal     we_in            : std_logic;
+    signal     coef_addr_in     : std_logic_vector(log2c(order) - 1 downto 0);
+    signal     coef_in          : std_logic_vector(data_w - 1 downto 0);
+    signal     u_in             : std_logic_vector(data_w - 1 downto 0);
+    signal     y_out            : std_logic_vector(data_w - 1 downto 0);
     type       data_reg is array (natural range <>) of std_logic_vector(data_w - 1 downto 0);
     signal has_checks : std_logic := '0';
     -- open octave files
@@ -59,8 +59,8 @@ WaveGenProc: process
        wait until falling_edge(clk);
        for i in 0 to order loop
          we_in <= '1';
-         signal_force("ft_fir_tb/DUT/FIR_1/y_out", "000000000000000000000000", 0 ns, freeze, open, 1);
-         signal_force("ft_fir_tb/DUT/FIR_3/y_out", "000000000000000000000000", 0 ns, freeze, open, 1);
+         signal_force("ft_fir_tb/DUT/fir1_out", "000000000000000000000000", 0 ns, freeze, open, 1);
+         signal_force("ft_fir_tb/DUT/fir3_out","000000000000000000000000", 0 ns, freeze, open, 1);
          coef_addr_in <= std_logic_vector(to_unsigned(i, log2c(order)));
          readline(coef_oct, file_line);
          st_ln := (others => ' ');
@@ -92,8 +92,9 @@ WaveGenProc: process
       st_ln := (others => ' ');
       read(check_line, st_ln(1 to check_line'length));
       temp:=to_std_logic_vector(st_ln);
-      if(abs(signed(temp)) - abs(signed(y_out)) > "000000000000000000000111") then
-        report "result mismatch" severity failure;
+      if(abs(signed(temp)) /= abs(signed(y_out))) then
+        report "result mismatch" severity warning;
+        report "Expected value is: " & st_ln & " Result is: " & to_string(y_out);
       end if;
     end loop;
   end process;

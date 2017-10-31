@@ -6,6 +6,7 @@ package util_pkg is
   function log2c(n:integer) return integer;
   function to_std_logic(ch: character) return std_logic;
   function to_std_logic_vector(st: string) return std_logic_vector;
+  function to_string(a: std_logic_vector) return string;
 end util_pkg;
 
 package body util_pkg is
@@ -45,5 +46,16 @@ package body util_pkg is
       end loop;
       return st_l;
     end to_std_logic_vector;
+
+    function to_string(a: std_logic_vector) return string is
+      variable b: string (1 to a'length);
+      variable stri: integer := 1;
+    begin
+      for i in a'range loop
+        b(stri) := std_logic'image(a((i)))(2);
+        stri := stri + 1;
+      end loop;
+      return b;
+    end to_string;
 
 end util_pkg;
