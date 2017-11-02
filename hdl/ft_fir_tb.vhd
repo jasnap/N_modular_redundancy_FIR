@@ -41,7 +41,7 @@ DUT : entity work.fault_tolerant_fir
 				u_in		 => u_in,
 				y_out 		 => y_out
 				);
-clk_proc: process
+ClkProc: process
 begin
   clk <= '0';
   wait for period/2;
@@ -59,8 +59,6 @@ WaveGenProc: process
        wait until falling_edge(clk);
        for i in 0 to order loop
          we_in <= '1';
-         signal_force("ft_fir_tb/DUT/fir1_out", "000000000000000000000000", 0 ns, freeze, open, 1);
-         signal_force("ft_fir_tb/DUT/fir3_out","000000000000000000000000", 0 ns, freeze, open, 1);
          coef_addr_in <= std_logic_vector(to_unsigned(i, log2c(order)));
          readline(coef_oct, file_line);
          st_ln := (others => ' ');
@@ -79,6 +77,50 @@ WaveGenProc: process
        end loop;
        has_checks <= '0';
      end process WaveGenProc;
+
+  FaultInjectionProc: process
+  begin
+    wait until falling_edge(clk);
+    --Force FIR1 output to 0
+    signal_force("ft_fir_tb/DUT/fir1_out", "000000000000000000000000", 0 ns, freeze, open, 1);
+    --Force FIR2 output to 1
+    signal_force("ft_fir_tb/DUT/fir2_out","000000000000000000000000", 400 ns, freeze, open, 1);
+    --Force FIR3 output to 0, therefore forcing the output to be invalid
+    signal_force("ft_fir_tb/DUT/fir3_out","000000000000000000000000", 800 ns, freeze, open, 1);
+
+    --Example for MAC
+    wait for 800 ns;
+    signal_release("ft_fir_tb/DUT/fir1_out", 1);
+    signal_release("ft_fir_tb/DUT/fir2_out", 1);
+    signal_release("ft_fir_tb/DUT/fir3_out", 1);
+
+    --Force reg_s to 0
+    signal_force("ft_fir_tb/DUT/FIR1/reg_s", "000000000000000000000000", 0 ns, freeze, open, 1);
+    wait for 400 ns;
+
+    --Force reg_s to 1
+    signal_force("ft_fir_tb/DUT/FIR1/reg_s", "111111111111111111111111", 0 ns, freeze, open, 1);
+    wait for 400 ns;
+
+    --Force reg_s to 0
+    signal_release("ft_fir_tb/DUT/FIR1/reg_s", 1);
+    signal_force("ft_fir_tb/DUT/FIR1/mul_out", "000000000000000000000000", 0 ns, freeze, open, 1);
+    wait for 400 ns;
+
+    --Force reg_s to 1
+    signal_force("ft_fir_tb/DUT/FIR1/mul_out", "111111111111111111111111", 0 ns, freeze, open, 1);
+    wait for 400 ns;
+
+    --Force reg_s to 0
+    signal_release("ft_fir_tb/DUT/FIR1/mul_out", 1);
+    signal_force("ft_fir_tb/DUT/FIR1/y_out", "000000000000000000000000", 0 ns, freeze, open, 1);
+    wait for 400 ns;
+
+    --Force reg_s to 1
+    signal_force("ft_fir_tb/DUT/FIR1/y_out", "111111111111111111111111", 0 ns, freeze, open, 1);
+    wait for 400 ns;
+    signal_release("ft_fir_tb/DUT/FIR1/y_out", 1);
+  end process FaultInjectionProc;
 
   ResultCheckingProc: process
     variable check_line: line;
