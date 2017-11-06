@@ -78,49 +78,49 @@ WaveGenProc: process
        has_checks <= '0';
      end process WaveGenProc;
 
-  FaultInjectionProc: process
-  begin
-    wait until falling_edge(clk);
-    --Force FIR1 output to 0
-    signal_force("ft_fir_tb/DUT/fir1_out", "000000000000000000000000", 0 ns, freeze, open, 1);
-    --Force FIR2 output to 1
-    signal_force("ft_fir_tb/DUT/fir2_out","000000000000000000000000", 400 ns, freeze, open, 1);
-    --Force FIR3 output to 0, therefore forcing the output to be invalid
-    signal_force("ft_fir_tb/DUT/fir3_out","000000000000000000000000", 800 ns, freeze, open, 1);
+  --FaultInjectionProc: process
+  --begin
+  --  wait until falling_edge(clk);
+  --  --Force FIR1 output to 0
+  --  signal_force("ft_fir_tb/DUT/fir1_out", "000000000000000000000000", 0 ns, freeze, open, 1);
+  --  --Force FIR2 output to 1
+  --  signal_force("ft_fir_tb/DUT/fir2_out","000000000000000000000000", 400 ns, freeze, open, 1);
+  --  --Force FIR3 output to 0, therefore forcing the output to be invalid
+  --  signal_force("ft_fir_tb/DUT/fir3_out","000000000000000000000000", 800 ns, freeze, open, 1);
 
-    --Example for MAC
-    wait for 800 ns;
-    signal_release("ft_fir_tb/DUT/fir1_out", 1);
-    signal_release("ft_fir_tb/DUT/fir2_out", 1);
-    signal_release("ft_fir_tb/DUT/fir3_out", 1);
+  --  --Example for MAC
+  --  wait for 800 ns;
+  --  signal_release("ft_fir_tb/DUT/fir1_out", 1);
+  --  signal_release("ft_fir_tb/DUT/fir2_out", 1);
+  --  signal_release("ft_fir_tb/DUT/fir3_out", 1);
 
-    --Force reg_s to 0
-    signal_force("ft_fir_tb/DUT/FIR1/reg_s", "000000000000000000000000", 0 ns, freeze, open, 1);
-    wait for 400 ns;
+  --  --Force reg_s to 0
+  --  signal_force("ft_fir_tb/DUT/FIR_1/MAC0/reg_s", "000000000000000000000000000000000000000000000000", 0 ns, freeze, open, 1);
+  --  wait for 400 ns;
 
-    --Force reg_s to 1
-    signal_force("ft_fir_tb/DUT/FIR1/reg_s", "111111111111111111111111", 0 ns, freeze, open, 1);
-    wait for 400 ns;
+  --  --Force reg_s to 1
+  --  signal_force("ft_fir_tb/DUT/FIR_1/MAC0/reg_s", "111111111111111111111111111111111111111111111111", 0 ns, freeze, open, 1);
+  --  wait for 400 ns;
 
-    --Force reg_s to 0
-    signal_release("ft_fir_tb/DUT/FIR1/reg_s", 1);
-    signal_force("ft_fir_tb/DUT/FIR1/mul_out", "000000000000000000000000", 0 ns, freeze, open, 1);
-    wait for 400 ns;
+  --  --Force reg_s to 0
+  --  signal_release("ft_fir_tb/DUT/FIR_1/MAC0/reg_s", 1);
+  --  signal_force("ft_fir_tb/DUT/FIR_1/MAC0/mul_out", "000000000000000000000000000000000000000000000000", 0 ns, freeze, open, 1);
+  --  wait for 400 ns;
 
-    --Force reg_s to 1
-    signal_force("ft_fir_tb/DUT/FIR1/mul_out", "111111111111111111111111", 0 ns, freeze, open, 1);
-    wait for 400 ns;
+  --  --Force reg_s to 1
+  --  signal_force("ft_fir_tb/DUT/FIR_1/MAC0/mul_out", "111111111111111111111111111111111111111111111111", 0 ns, freeze, open, 1);
+  --  wait for 400 ns;
 
-    --Force reg_s to 0
-    signal_release("ft_fir_tb/DUT/FIR1/mul_out", 1);
-    signal_force("ft_fir_tb/DUT/FIR1/y_out", "000000000000000000000000", 0 ns, freeze, open, 1);
-    wait for 400 ns;
+  --  --Force reg_s to 0
+  --  signal_release("ft_fir_tb/DUT/FIR_1/MAC0/mul_out", 1);
+  --  signal_force("ft_fir_tb/DUT/FIR_1/MAC0/mac_out", "000000000000000000000000000000000000000000000000", 0 ns, freeze, open, 1);
+  --  wait for 400 ns;
 
-    --Force reg_s to 1
-    signal_force("ft_fir_tb/DUT/FIR1/y_out", "111111111111111111111111", 0 ns, freeze, open, 1);
-    wait for 400 ns;
-    signal_release("ft_fir_tb/DUT/FIR1/y_out", 1);
-  end process FaultInjectionProc;
+  --  --Force reg_s to 1
+  --  signal_force("ft_fir_tb/DUT/FIR_1/MAC0/mac_out", "111111111111111111111111111111111111111111111111", 0 ns, freeze, open, 1);
+  --  wait for 400 ns;
+  --  signal_release("ft_fir_tb/DUT/FIR_1/MAC0/mac_out", 1);
+  --end process FaultInjectionProc;
 
   ResultCheckingProc: process
     variable check_line: line;
@@ -134,7 +134,7 @@ WaveGenProc: process
       st_ln := (others => ' ');
       read(check_line, st_ln(1 to check_line'length));
       temp:=to_std_logic_vector(st_ln);
-      if(abs(signed(temp)) /= abs(signed(y_out))) then
+      if(abs(signed(temp)) - abs(signed(y_out)) < "000000000000000000000111") then
         report "result mismatch" severity warning;
         report "Expected value is: " & st_ln & " Result is: " & to_string(y_out);
       end if;

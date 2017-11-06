@@ -10,12 +10,12 @@ Fs = 22050;
 dB  = 38;
 N = dB*Fs/(22*delta_f)
 
-f =  [f1 ]/(Fs/2)
+f =  [f1 ]/(Fs/2);
 hc = fir1(round(N)-1, f,'low'); %filter coeficients
 
-bb = round(hc*(2^24))
-bin_bb = dec2bin(bb, 24)
-fileIDbb=fopen('coef_oct.txt', 'w')
+bb = round(hc*(2^24));
+bin_bb = dec2bin(bb, 24);
+fileIDbb=fopen('coef_oct.txt', 'w');
 dlmwrite(fileIDbb, bin_bb, '');
 fclose(fileIDbb);
 
@@ -26,11 +26,11 @@ title('Filter Frequency Response - Filter coeficients')
 grid on
 
 n = 0:149;
-x = 0.85*cos(2*pi*f1/Fs*n) + 0.2*cos(2*pi*f2/Fs*n);
+x = 0.85*cos(2*pi*f1/Fs*n) + 0.2*cos(2*pi*f2/Fs*n)
 %x = sin(2*pi*[1:1000]*5000/Fs) +  sin(2*pi*[1:1000]*2000/Fs) + sin(2*pi*[1:1000]*13000/Fs)  + sin(2*pi*[1:1000]*18000/Fs);
 
 sig = 20*log10(abs(fftshift(fft(x,4096))));
-xf = filter(hc,1,x);
+xf = filter(hc,1,x)
 
 figure
 subplot(211)
