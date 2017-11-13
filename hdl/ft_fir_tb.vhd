@@ -134,7 +134,7 @@ WaveGenProc: process
       st_ln := (others => ' ');
       read(check_line, st_ln(1 to check_line'length));
       temp:=to_std_logic_vector(st_ln);
-      if(abs(signed(temp)) - abs(signed(y_out)) < "000000000000000000000111") then
+      if(abs(signed(temp)) - abs(signed(y_out)) > "000000000000000000000111") then
         report "result mismatch" severity warning;
         report "Expected value is: " & st_ln & " Result is: " & to_string(y_out);
       end if;

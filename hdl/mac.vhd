@@ -15,7 +15,7 @@ end MAC;
 
 architecture Behavioral of MAC is
   signal reg_s : std_logic_vector(2*data_w-1 downto 0) := (others => '0');
-  signal mul_out: unsigned(2*data_w-1 downto 0) := (others => '0');
+  signal mul_out: signed(2*data_w-1 downto 0) := (others => '0');
 
 begin  -- architecture Behavioral
 
@@ -23,10 +23,10 @@ begin  -- architecture Behavioral
   begin
     if clk'event and clk ='1' then
       reg_s <= mac_in;
-      mul_out <= unsigned(u_in) * unsigned(b_in);
     end if;
   end process;
 
-  mac_out <= std_logic_vector(unsigned(reg_s) + mul_out);
+  mul_out <= signed(u_in) * signed(b_in);
+  mac_out <= std_logic_vector(signed(reg_s) + mul_out);
 
 end Behavioral;

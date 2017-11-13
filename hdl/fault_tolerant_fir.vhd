@@ -24,7 +24,7 @@ signal voter_out: std_logic_vector(data_w - 1 downto 0);
 
 component FIR
   generic (
-    order     : natural := 10;
+    order     : natural := 20;
     data_w    : natural := 24);
   port (
     clk          : in  std_logic;

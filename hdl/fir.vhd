@@ -21,9 +21,9 @@ end FIR;
 architecture Behavioral of FIR is
 
   type data_array is array (order downto 0) of std_logic_vector(2*data_w - 1 downto 0);
-  signal data_reg : data_array;
+  signal data_reg : data_array := (others => (others => '0'));
   type coef_array is array (order downto 0) of std_logic_vector(data_w - 1 downto 0);
-  signal b_s : coef_array;
+  signal b_s : coef_array := (others => (others => '0'));
 
   component MAC
     generic (
@@ -55,7 +55,7 @@ begin  -- architecture Behavioral
              mac_out => data_reg(0));
 
   MAC_OTHERS:
-  for i in 1 to order-1 generate
+  for i in 1 to order generate
   MAC_X:MAC generic map(data_w => data_w)
     port map(
               clk     => clk,
@@ -68,7 +68,7 @@ begin  -- architecture Behavioral
   process(clk)
   begin
       if(clk'event and clk='1')then
-          y_out <= data_reg(order-1)(2*data_w-1 downto data_w);
+          y_out <= data_reg(order)(2*data_w-2 downto data_w - 1);
       end if;
   end process;
 end Behavioral;
