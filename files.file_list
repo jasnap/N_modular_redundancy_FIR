@@ -1,7 +1,0 @@
--93
-hdl/mac.vhd
-hdl/fir.vhd
-hdl/util_pkg.vhd
-hdl/voter.vhd
-hdl/fault_tolerant_fir.vhd
-hdl/ft_fir_tb.vhd
