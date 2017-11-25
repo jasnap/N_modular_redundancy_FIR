@@ -23,9 +23,9 @@ architecture Behavioral of ft_fir_tb is
     type       data_reg is array (natural range <>) of std_logic_vector(data_w - 1 downto 0);
     signal has_checks : std_logic := '0';
     -- open octave files
-    file input_oct: text open read_mode is "/home/jasna/Documents/projects/N_modular_redundancy_FIR/fir_matlab/input.txt";
-    file coef_oct: text open read_mode is "/home/jasna/Documents/projects/N_modular_redundancy_FIR/fir_matlab/coef.txt";
-    file expected_oct: text open read_mode is "/home/jasna/Documents/projects/N_modular_redundancy_FIR/fir_matlab/expected.txt";
+    file input_oct: text open read_mode is "/home/jasna/Documents/projects/N_modular_redundancy_FIR/fir_matlab/my_input.txt";
+    file coef_oct: text open read_mode is "/home/jasna/Documents/projects/N_modular_redundancy_FIR/fir_matlab/my_coef.txt";
+    file expected_oct: text open read_mode is "/home/jasna/Documents/projects/N_modular_redundancy_FIR/fir_matlab/my_expected.txt";
 
 begin
 
@@ -88,39 +88,39 @@ WaveGenProc: process
     --Force FIR3 output to 0, therefore forcing the output to be invalid
     signal_force("ft_fir_tb/DUT/fir3_out","000000000000000000000000", 800 ns, freeze, open, 1);
 
-    --Example for MAC
+    ----Example for MAC
     wait for 1 us;
     signal_release("ft_fir_tb/DUT/fir1_out", 1);
     signal_release("ft_fir_tb/DUT/fir2_out", 1);
     signal_release("ft_fir_tb/DUT/fir3_out", 1);
 
-    wait for 1 us;
     --Force reg_s to 0
     signal_force("ft_fir_tb/DUT/FIR_1/MAC0/reg_s", "000000000000000000000000000000000000000000000000", 0 ns, freeze, open, 1);
-    wait for 400 ns;
 
     --Force reg_s to 1
-    signal_force("ft_fir_tb/DUT/FIR_1/MAC0/reg_s", "111111111111111111111111111111111111111111111111", 0 ns, freeze, open, 1);
-    wait for 400 ns;
+    signal_force("ft_fir_tb/DUT/FIR_1/MAC0/reg_s", "111111111111111111111111111111111111111111111111", 500 ns, freeze, open, 1);
+
+    wait for 1 us;
+    signal_release("ft_fir_tb/DUT/FIR_1/MAC0/reg_s", 1);
 
     --Force mul_out to 0
-    signal_release("ft_fir_tb/DUT/FIR_1/MAC0/reg_s", 1);
     signal_force("ft_fir_tb/DUT/FIR_1/MAC0/mul_out", "000000000000000000000000000000000000000000000000", 0 ns, freeze, open, 1);
-    wait for 400 ns;
 
     --Force mul_out to 1
-    signal_force("ft_fir_tb/DUT/FIR_1/MAC0/mul_out", "111111111111111111111111111111111111111111111111", 0 ns, freeze, open, 1);
-    wait for 400 ns;
+    signal_force("ft_fir_tb/DUT/FIR_1/MAC0/mul_out", "111111111111111111111111111111111111111111111111", 500 ns, freeze, open, 1);
+
+    wait for 1 us;
+    signal_release("ft_fir_tb/DUT/FIR_1/MAC0/mul_out", 1);
 
     --Force mac_out to 0
-    signal_release("ft_fir_tb/DUT/FIR_1/MAC0/mul_out", 1);
-    signal_force("ft_fir_tb/DUT/FIR_4/MAC0/mac_out", "000000000000000000000000000000000000000000000000", 0 ns, freeze, open, 1);
-    wait for 400 ns;
+    signal_force("ft_fir_tb/DUT/FIR_1/MAC0/mac_out", "000000000000000000000000000000000000000000000000", 0 ns, freeze, open, 1);
 
     --Force mac_out to 1
-    signal_force("ft_fir_tb/DUT/FIR_4/MAC0/mac_out", "111111111111111111111111111111111111111111111111", 0 ns, freeze, open, 1);
-    wait for 400 ns;
-    signal_release("ft_fir_tb/DUT/FIR_4/MAC0/mac_out", 1);
+    signal_force("ft_fir_tb/DUT/FIR_1/MAC0/mac_out", "111111111111111111111111111111111111111111111111", 500 ns, freeze, open, 1);
+
+    wait for 1 us;
+    signal_release("ft_fir_tb/DUT/FIR_1/MAC0/mac_out", 1);
+
     wait for 1 us;
   end process FaultInjectionProc;
 
